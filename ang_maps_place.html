@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<title>Google Maps API with Angular JS</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=<YOUR_API_KEY>&libraries=places"></script>
+		<script>
+			var app=angular.module("map",[]);
+			app.controller("mapctrlr",function($scope){
+			$scope.check=function(){
+			//document.getElementById("test").innerHTML=$scope.lat;
+			
+			
+			var geocoder = new google.maps.Geocoder();
+            var address = $scope.address;
+			
+			
+            geocoder.geocode({ 'address': address }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    var lat = results[0].geometry.location.lat();
+                    var lon = results[0].geometry.location.lng();
+					var place = new google.maps.LatLng(lat,lon);
+			alert(place);
+			var map = new google.maps.Map(document.getElementById('mapdisp'), {
+				center: place,
+				zoom: 15,
+				scrollwheel: false
+			});
+			var request = {
+				location: place,
+				radius: $scope.radius,
+				types: [$scope.searchfor]
+			};
+			var service = new google.maps.places.PlacesService(map);
+			service.nearbySearch(request, function(results, status) {
+			if (status == google.maps.places.PlacesServiceStatus.OK) 
+			{
+				for (var i = 0; i < results.length; i++) 
+				{
+					var place = results[i];
+					var marker = new google.maps.Marker({
+						map: map,
+						position: place.geometry.location
+					});
+				}
+			}
+			});
+                    alert("Latitude: " + latitude + "\nLongitude: " + longitude);
+                } else {
+                    alert("Place not found");
+                }
+            });
+			
+			
+			
+			}
+			});
+			function setmap()
+			{
+				var place = new google.maps.LatLng(12.1065,78.1361);
+				var map = new google.maps.Map(document.getElementById('mapdisp'), {
+				center: place,
+				zoom: 15,
+				scrollwheel: false
+			});
+			}
+		</script>
+	</head>
+	<body ng-app="map" ng-controller="mapctrlr" onload="setmap()">
+		<h3 align="center" style="color:Red">Google Maps API with Angular JS</h3>
+		<hr>
+		<table>
+			<tr>
+				<td>Place</td>
+				<td><input type="text" ng-model="address"></td>
+				<td>Search for</td>
+				<td><select ng-model="searchfor">
+								<option value="art_gallery">art_gallery</option>
+								<option value="atm">atm</option>
+								<option value="bank">bank</option>
+								<option value="bar">bar</option>
+								<option value="cafe">cafe</option>
+								<option value="food">food</option>
+								<option value="hospital">hospital</option>
+								<option value="police">police</option>
+								<option value="store">store</option>
+							</select>
+				</td>
+				<td>Radius</td>
+				<td><select ng-model="radius">
+								<option value="500">500</option>
+								<option value="1000">1000</option>
+								<option value="1500">1500</option>
+								<option value="5000">5000</option>
+							</select>
+				</td>
+				<td><button ng-click="check()">Search</button></td>
+				</tr>
+		</table>
+		<hr>
+		<div id="mapdisp" style="width:100%;height:550px;">
+		</div>
+		
+	</body>
+</html>
